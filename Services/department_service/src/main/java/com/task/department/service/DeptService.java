@@ -7,6 +7,7 @@ import com.task.department.dto.mapper.DeptMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +45,8 @@ public class DeptService {
         if(!deptDtoList.isEmpty())
             return deptDtoList;
         else
-            throw new RuntimeException("No Department found");
+            log.error("No Department found for getAllDepts");
+        return Collections.emptyList();
     }
 
     public List<DeptDto> getAllDeptsById(List<Long> deptIds) {
@@ -54,7 +56,8 @@ public class DeptService {
         if(!deptDtoList.isEmpty())
             return deptDtoList;
         else
-            throw new RuntimeException("No Department found");
+            log.error("No Department found for getAllDeptsById");
+        return Collections.emptyList();
     }
 
     public DeptDto findByDeptId(long deptId) {
@@ -66,6 +69,8 @@ public class DeptService {
         if(Objects.nonNull(deptDto))
             return deptDto;
         else
-            throw new RuntimeException("No Department found for " + deptId);
+            log.error("No Department found for {}", deptId);
+        return null;
+
     }
 }
