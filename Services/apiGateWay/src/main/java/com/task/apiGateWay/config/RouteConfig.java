@@ -20,8 +20,19 @@ public class RouteConfig {
                                 .and()
                                 .method(HttpMethod.POST)
                                 .and()
-                                .method(HttpMethod.PATCH,HttpMethod.GET,HttpMethod.DELETE)
-                                .negate()
+                                .uri("lb://employee-service")
+                )
+
+                .route("save-external-employee-route",
+                        emp -> emp
+                                .path("/api/employee/saveEmp")
+                                .and()
+                                .method(HttpMethod.POST)
+                                .filters(f ->
+                                        f.stripPrefix(1)
+                                                .addRequestHeader("X-Gateway-Source", "Gateway-8080")
+                                                .addResponseHeader("X-App-Source", "Task", false)
+                                )
                                 .uri("lb://employee-service")
                 )
 
@@ -32,6 +43,29 @@ public class RouteConfig {
                                 .path("/employee/getEmp/{id:[0-9]+}")
                                 .and()
                                 .method(HttpMethod.GET)
+                                .uri("lb://employee-service")
+                )
+
+                .route("get-path-chg-employee-route",
+                        emp -> emp
+                                .path("/api/emp/{id}/get")
+                                .and()
+                                .method(HttpMethod.GET)
+                                .filters(f -> f
+                                        .setPath("/employee/getEmp/{id}")
+                                )
+                                .uri("lb://employee-service")
+                )
+
+                .route("get-path-chg2-employee-route",
+                        emp -> emp
+                                .path("/api/employee/{id:[0-9]+}/get")
+                                .and()
+                                .method(HttpMethod.GET)
+                                .filters(f -> f
+                                        .rewritePath("/api/employee/(?<id>[0-9]+)/get", "/employee/getEmp/${id}")
+                                        .addResponseHeader("X-App-Source", "Task")
+                                )
                                 .uri("lb://employee-service")
                 )
 
