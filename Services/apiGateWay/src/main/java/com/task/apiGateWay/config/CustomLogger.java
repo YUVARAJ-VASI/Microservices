@@ -1,6 +1,7 @@
 package com.task.apiGateWay.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.*;
 
@@ -23,11 +25,14 @@ public class CustomLogger implements GlobalFilter, Ordered {
     @Override
     @NullMarked
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // Get the original request URL
+
+        String reqCorId = exchange.getRequest().getHeaders().getFirst("X-Correlation-Id");
+        String correlationId = StringUtils.isBlank(reqCorId) ? UUID.randomUUID().toString() : reqCorId;
+
+
         Set<URI> originalUris = exchange.getAttributeOrDefault(GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
         String originalUri = originalUris.isEmpty() ? exchange.getRequest().getURI().toString() : originalUris.iterator().next().toString();
 
-        // Get the route information
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
         URI routeUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
 
@@ -37,7 +42,12 @@ public class CustomLogger implements GlobalFilter, Ordered {
             log.info("Request: {} -> No matching route found.", originalUri);
         }
 
-        return chain.filter(exchange);
+        ServerWebExchange mutated = exchange.mutate().request(request -> request
+                .header("X-Correlation-Id", correlationId)
+                .build()
+        ).build();
+
+        return chain.filter(exchange.mutate().request(mutated.getRequest()).build());
     }
 
     @Override
