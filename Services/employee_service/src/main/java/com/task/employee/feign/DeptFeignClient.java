@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "department-service", path = "/department")
+@FeignClient(name = "department-service", path = "/department", configuration = DeptFeignConfig.class)
 public interface DeptFeignClient {
 
     @GetMapping("/getDept/{id}")

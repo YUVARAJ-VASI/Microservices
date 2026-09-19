@@ -29,7 +29,11 @@ public class DeptService {
         log.info("saveEmp Request: {}",  deptDto);
 
         DeptEntity deptEntity;
-
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){
+            log.error("saveDept : ",e);
+        }
         if (Objects.isNull(deptDto.name()))
             throw new RuntimeException("Department name can't be NULL");
         else
@@ -39,6 +43,12 @@ public class DeptService {
     }
 
     public List<DeptDto> getAllDepts() {
+
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){
+            log.error("saveDept : ",e);
+        }
 
         List<DeptDto> deptDtoList = deptMapper.toDto(deptRepository.findAll());
 
@@ -51,6 +61,12 @@ public class DeptService {
 
     public List<DeptDto> getAllDeptsById(List<Long> deptIds) {
 
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){
+            log.error("saveDept : ",e);
+        }
+
         List<DeptDto> deptDtoList = deptMapper.toDto(deptRepository.findAllById(deptIds));
 
         if(!deptDtoList.isEmpty())
@@ -61,6 +77,12 @@ public class DeptService {
     }
 
     public DeptDto findByDeptId(long deptId) {
+
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){
+            log.error("saveDept : ",e);
+        }
 
         log.info("getDeptById Request: {}",  deptId);
 
